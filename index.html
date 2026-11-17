@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petualangan Dunia Matriks 3×3</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Orbitron & Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Orbitron', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        cyber: {
+                            dark: '#060919',
+                            navy: '#0d1333',
+                            blue: '#00d2ff',
+                            purple: '#9d4edd',
+                            violet: '#5a189a',
+                            neon: '#38bdf8'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Futuristik Styling & Animasi */
+        body {
+            background-color: #060919;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(157, 78, 221, 0.22) 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, rgba(0, 210, 255, 0.2) 0%, transparent 45%),
+                linear-gradient(rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Card */
+        .cyber-card {
+            background: rgba(15, 23, 54, 0.78);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55), inset 0 0 24px rgba(157, 78, 221, 0.14);
+        }
+
+        .cyber-glow-btn {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 50%, #06b6d4 100%);
+            background-size: 200% 200%;
+            animation: gradientFlow 4s ease infinite;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.45), 0 6px 15px rgba(124, 58, 237, 0.4);
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+        }
+
+        .cyber-glow-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 0 28px rgba(56, 189, 248, 0.75), 0 8px 22px rgba(157, 78, 221, 0.6);
+        }
+
+        .cyber-glow-btn:active {
+            transform: scale(0.98);
+        }
+
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Notasi Matriks 3x3 Kurung Siku Rapi & Presisi */
+        .matrix-wrapper {
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+            margin: 4px 6px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .matrix-label {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #38bdf8;
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+
+        .matrix-bracket {
+            position: relative;
+            display: inline-grid;
+            grid-template-columns: repeat(3, minmax(2.1rem, auto));
+            gap: 0.35rem 0.65rem;
+            padding: 0.45rem 0.75rem;
+            background: rgba(6, 12, 34, 0.65);
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        /* Kurung siku kiri & kanan dengan border CSS tajam & bersih */
+        .matrix-bracket::before,
+        .matrix-bracket::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            bottom: 2px;
+            width: 8px;
+            border: 2.5px solid #38bdf8;
+        }
+
+        .matrix-bracket::before {
+            left: 0;
+            border-right: none;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .matrix-bracket::after {
+            right: 0;
+            border-left: none;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+        /* Variasi matriks ukuran mini untuk opsi jawaban */
+        .matrix-option .matrix-bracket {
+            grid-template-columns: repeat(3, minmax(1.65rem, auto));
+            gap: 0.25rem 0.45rem;
+            padding: 0.35rem 0.6rem;
+            font-size: 0.88rem;
+            background: rgba(15, 23, 54, 0.85);
+        }
+
+        .matrix-option .matrix-bracket::before,
+        .matrix-option .matrix-bracket::after {
+            border-color: #a855f7;
+            width: 6px;
+            border-width: 2px;
+        }
+
+        .matrix-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 1.4rem;
+        }
+
+        /* Animasi Umpan Balik */
+        @keyframes shakeWrong {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-6px); }
+            80% { transform: translateX(6px); }
+        }
+
+        @keyframes popCorrect {
+            0% { transform: scale(1); }
+            45% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes pulseUrgent {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { transform: scale(1.06); box-shadow: 0 0 18px rgba(239, 68, 68, 0.85); }
+        }
+
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-7px); }
+        }
+
+        .animate-shake {
+            animation: shakeWrong 0.45s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        .animate-pop {
+            animation: popCorrect 0.4s ease-out both;
+        }
+
+        .timer-urgent {
+            animation: pulseUrgent 0.8s infinite;
+            border-color: #ef4444 !important;
+            color: #fecaca !important;
+            background: rgba(127, 29, 29, 0.75) !important;
+        }
+
+        .floating-icon {
+            animation: floatSlow 3.5s ease-in-out infinite;
+        }
+
+        /* Pilihan Jawaban Button */
+        .option-btn {
+            background: rgba(20, 30, 68, 0.72);
+            border: 1.5px solid rgba(99, 102, 241, 0.35);
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: rgba(37, 54, 114, 0.9);
+            border-color: #38bdf8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(56, 189, 248, 0.22);
+        }
+
+        .option-correct {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.28), rgba(5, 150, 105, 0.42)) !important;
+            border-color: #10b981 !important;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.35) !important;
+        }
+
+        .option-wrong {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.28), rgba(185, 28, 28, 0.42)) !important;
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.35) !important;
+        }
+
+        .option-dimmed {
+            opacity: 0.55;
+        }
+
+        /* Konfeti Canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-400 selection:text-slate-950">
+
+    <!-- Canvas Konfeti untuk Perayaan -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Header / Top Bar -->
+    <header class="w-full max-w-4xl mx-auto px-4 pt-4 pb-2 flex items-center justify-between z-10">
+        <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400 to-purple-600 flex items-center justify-center shadow-lg shadow-cyan-500/30 font-display font-black text-slate-950 text-sm">
+                3×3
+            </div>
+            <div>
+                <span class="font-display font-bold text-xs sm:text-sm tracking-wider text-cyan-300 uppercase block">Cyber Math Arena</span>
+                <span class="text-[11px] text-slate-400 hidden sm:inline">Eksplorasi Matriks Berordo 3×3</span>
+            </div>
+        </div>
+
+        <button id="audio-toggle-btn" onclick="toggleAudio()" aria-label="Suara" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900/80 border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 text-xs font-semibold transition cursor-pointer">
+            <span id="audio-icon">🔊</span>
+            <span id="audio-label" class="hidden sm:inline">Suara Aktif</span>
+        </button>
+    </header>
+
+    <!-- Main Container -->
+    <main class="w-full max-w-4xl mx-auto px-4 py-3 flex-grow flex items-center justify-center z-10">
+
+        <!-- ==================== 1. HALAMAN PEMBUKA (START SCREEN) ==================== -->
+        <section id="start-screen" class="w-full cyber-card rounded-3xl p-6 sm:p-10 text-center relative overflow-hidden">
+            <!-- Dekorasi sudut futuristik -->
+            <div class="absolute top-0 left-0 w-24 h-24 bg-cyan-500/10 rounded-br-full pointer-events-none"></div>
+            <div class="absolute bottom-0 right-0 w-28 h-28 bg-purple-500/15 rounded-tl-full pointer-events-none"></div>
+
+            <!-- Ikon Futuristik SVG -->
+            <div class="floating-icon inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-blue-600/30 via-purple-600/30 to-cyan-400/30 border border-cyan-400/50 shadow-xl shadow-purple-500/20 mb-5">
+                <svg class="w-12 h-12 sm:w-14 sm:h-14 text-cyan-300" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 10H8V54H14" stroke="#38BDF8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M50 10H56V54H50" stroke="#A855F7" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="21" cy="20" r="3.5" fill="#38BDF8"/>
+                    <circle cx="32" cy="20" r="3.5" fill="#E2E8F0"/>
+                    <circle cx="43" cy="20" r="3.5" fill="#A855F7"/>
+                    <circle cx="21" cy="32" r="3.5" fill="#E2E8F0"/>
+                    <circle cx="32" cy="32" r="4.5" fill="#22D3EE"/>
+                    <circle cx="43" cy="32" r="3.5" fill="#E2E8F0"/>
+                    <circle cx="21" cy="44" r="3.5" fill="#A855F7"/>
+                    <circle cx="32" cy="44" r="3.5" fill="#E2E8F0"/>
+                    <circle cx="43" cy="44" r="3.5" fill="#38BDF8"/>
+                </svg>
+            </div>
+
+            <div class="inline-block px-3.5 py-1 rounded-full bg-purple-500/20 border border-purple-400/40 text-purple-200 text-xs font-semibold tracking-wider uppercase mb-3">
+                Misi Matematika Interaktif
+            </div>
+
+            <h1 class="font-display font-black text-2xl sm:text-4xl md:text-5xl bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent leading-tight mb-4">
+                Petualangan Dunia<br>Matriks 3×3
+            </h1>
+
+            <p class="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed mb-7">
+                Selamat datang, Penjelajah Cyber! Taklukkan 3 zona tantangan matriks berordo 3×3 mulai dari konsep dasar hingga determinan & perkalian matriks untuk meraih gelar <span class="text-cyan-300 font-semibold">Ahli Matriks</span>.
+            </p>
+
+            <!-- Kartu Petunjuk Permainan -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto mb-8 text-left">
+                <div class="bg-slate-900/75 border border-cyan-500/25 rounded-2xl p-3.5">
+                    <div class="text-cyan-400 font-display font-bold text-lg mb-0.5">3 Level</div>
+                    <div class="text-xs text-slate-300">Mudah, Sedang, hingga Sulit</div>
+                </div>
+                <div class="bg-slate-900/75 border border-purple-500/25 rounded-2xl p-3.5">
+                    <div class="text-purple-400 font-display font-bold text-lg mb-0.5">15 Soal</div>
+                    <div class="text-xs text-slate-300">Pilihan ganda dengan pembahasan</div>
+                </div>
+                <div class="bg-slate-900/75 border border-blue-500/25 rounded-2xl p-3.5">
+                    <div class="text-blue-400 font-display font-bold text-lg mb-0.5">30 Detik</div>
+                    <div class="text-xs text-slate-300">Batas waktu setiap soal</div>
+                </div>
+                <div class="bg-slate-900/75 border border-emerald-500/25 rounded-2xl p-3.5">
+                    <div class="text-emerald-400 font-display font-bold text-lg mb-0.5">+10 Poin</div>
+                    <div class="text-xs text-slate-300">Setiap jawaban benar (Maks 150)</div>
+                </div>
+            </div>
+
+            <!-- Rincian Materi Per Level -->
+            <div class="bg-slate-950/60 border border-slate-700/60 rounded-2xl p-4 max-w-3xl mx-auto mb-8 text-left text-xs sm:text-sm space-y-2">
+                <div class="flex items-start gap-2.5">
+                    <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[11px] shrink-0 mt-0.5">LEVEL 1</span>
+                    <span class="text-slate-300"><strong class="text-white">Mudah (Soal 1–5):</strong> Konsep dasar, ordo matriks, elemen baris & kolom, kesamaan matriks, dan transpose matriks 3×3.</span>
+                </div>
+                <div class="flex items-start gap-2.5">
+                    <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold text-[11px] shrink-0 mt-0.5">LEVEL 2</span>
+                    <span class="text-slate-300"><strong class="text-white">Sedang (Soal 6–10):</strong> Penjumlahan, pengurangan, dan perkalian matriks 3×3 dengan bilangan skalar.</span>
+                </div>
+                <div class="flex items-start gap-2.5">
+                    <span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold text-[11px] shrink-0 mt-0.5">LEVEL 3</span>
+                    <span class="text-slate-300"><strong class="text-white">Sulit (Soal 11–15):</strong> Determinan matriks 3×3 (metode Sarrus/kofaktor) dan perkalian dua matriks 3×3.</span>
+                </div>
+            </div>
+
+            <button onclick="startGame()" class="cyber-glow-btn px-8 py-4 rounded-2xl font-display font-bold text-base sm:text-lg text-white tracking-wide cursor-pointer inline-flex items-center gap-3">
+                <span>🚀 Mulai Game</span>
+            </button>
+        </section>
+
+        <!-- ==================== 2. HALAMAN PERMAINAN (QUIZ SCREEN) ==================== -->
+        <section id="quiz-screen" class="hidden w-full space-y-4">
+            
+            <!-- Banner Notifikasi Naik Level -->
+            <div id="level-up-banner" class="hidden cyber-card rounded-2xl p-3.5 border-cyan-400 bg-gradient-to-r from-blue-900/90 via-purple-900/90 to-cyan-900/90 text-center animate-pop">
+                <p id="level-up-text" class="font-display font-bold text-sm sm:text-base text-cyan-200 tracking-wide">
+                    ⚡ MEMASUKI LEVEL 2: TANTANGAN SEDANG!
+                </p>
+            </div>
+
+            <!-- Status Bar Atas: Level, Progres, Timer, Skor -->
+            <div class="cyber-card rounded-2xl p-3.5 sm:p-4">
+                <div class="flex flex-wrap items-center justify-between gap-2.5 mb-3">
+                    <!-- Badge Level -->
+                    <div id="level-badge" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-display font-bold tracking-wide bg-emerald-500/20 border border-emerald-400/50 text-emerald-300">
+                        LEVEL 1 • MUDAH
+                    </div>
+
+                    <!-- Indikator Soal -->
+                    <div class="px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-700 text-xs sm:text-sm font-semibold text-slate-200">
+                        Soal <span id="question-number" class="text-cyan-400 font-display font-bold">1</span> / 15
+                    </div>
+
+                    <!-- Timer 30 Detik -->
+                    <div id="timer-box" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900/90 border border-cyan-500/40 text-cyan-300 font-display font-bold text-sm transition-all">
+                        <span>⏱️</span>
+                        <span id="timer-text">30</span><span>d</span>
+                    </div>
+
+                    <!-- Skor Real-time -->
+                    <div class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-950/80 border border-purple-400/40 text-purple-200 font-display font-bold text-sm">
+                        <span>💎 Skor:</span>
+                        <span id="score-text" class="text-white">0</span>
+                    </div>
+                </div>
+
+                <!-- Progress Bar Visual -->
+                <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 transition-all duration-500 rounded-full" style="width: 6.66%;"></div>
+                </div>
+            </div>
+
+            <!-- Kartu Soal Utama -->
+            <div id="question-card" class="cyber-card rounded-3xl p-5 sm:p-8">
+                <!-- Topik Soal -->
+                <div class="flex items-center justify-between gap-2 mb-3">
+                    <span id="question-topic" class="text-xs font-semibold uppercase tracking-wider text-cyan-400 bg-cyan-950/70 border border-cyan-500/30 px-3 py-1 rounded-lg">
+                        Konsep Dasar Matriks
+                    </span>
+                    <span class="text-xs text-slate-400">+10 Poin</span>
+                </div>
+
+                <!-- Teks & Visual Matriks Soal -->
+                <div id="question-content" class="text-base sm:text-lg text-white font-medium leading-relaxed mb-6">
+                    <!-- Diisi secara dinamis oleh JS -->
+                </div>
+
+                <!-- Grid 4 Pilihan Jawaban (A, B, C, D) -->
+                <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    <!-- Diisi secara dinamis oleh JS -->
+                </div>
+
+                <!-- Area Umpan Balik & Pembahasan (Muncul Setelah Menjawab) -->
+                <div id="feedback-box" class="hidden mt-6 rounded-2xl p-4 sm:p-5 border transition-all">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span id="feedback-icon" class="text-2xl">🎉</span>
+                        <h3 id="feedback-title" class="font-display font-bold text-base sm:text-lg">
+                            Hebat! Jawaban Kamu Benar!
+                        </h3>
+                    </div>
+                    <div class="bg-slate-950/65 rounded-xl p-3.5 border border-white/10 text-xs sm:text-sm text-slate-200 leading-relaxed mb-4">
+                        <span class="font-bold text-cyan-300 block mb-1">💡 Pembahasan:</span>
+                        <div id="explanation-text"></div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button id="next-btn" onclick="nextQuestion()" class="cyber-glow-btn px-6 py-3 rounded-xl font-display font-bold text-sm text-white cursor-pointer inline-flex items-center gap-2">
+                            <span id="next-btn-text">Soal Berikutnya</span>
+                            <span>➔</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 3. HALAMAN AKHIR (RESULT / SCOREBOARD SCREEN) ==================== -->
+        <section id="result-screen" class="hidden w-full cyber-card rounded-3xl p-6 sm:p-10 text-center relative overflow-hidden">
+            <div class="inline-block px-4 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-xs font-bold tracking-widest uppercase mb-3">
+                Misi Selesai • Laporan Akhir
+            </div>
+
+            <h2 class="font-display font-black text-2xl sm:text-4xl text-white mb-2">
+                Papan Skor Petualangan
+            </h2>
+            <p class="text-slate-300 text-sm mb-6">Berikut adalah hasil eksplorasi kamu di Dunia Matriks 3×3:</p>
+
+            <!-- Badge Predikat Utama -->
+            <div id="predicate-card" class="max-w-md mx-auto rounded-2xl p-5 mb-7 bg-gradient-to-br from-blue-600/30 via-purple-600/30 to-cyan-500/30 border-2 border-cyan-400/60 shadow-lg shadow-cyan-500/20">
+                <div class="text-xs uppercase tracking-wider text-cyan-200 font-semibold mb-1">Predikat Pemain</div>
+                <div id="final-predicate" class="font-display font-black text-2xl sm:text-3xl text-white">
+                    Ahli Matriks 🏆
+                </div>
+                <p id="predicate-desc" class="text-xs sm:text-sm text-slate-200 mt-2">
+                    Luar biasa! Penguasaan konsep dan operasi matriks 3×3 kamu sangat memukau!
+                </p>
+            </div>
+
+            <!-- Statistik Skor 4 Kolom -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 max-w-3xl mx-auto mb-8">
+                <div class="bg-slate-900/80 border border-purple-500/35 rounded-2xl p-4">
+                    <div class="text-xs text-slate-400 mb-1">Total Skor</div>
+                    <div class="font-display font-black text-2xl sm:text-3xl text-purple-300">
+                        <span id="final-score">0</span><span class="text-sm text-slate-400">/150</span>
+                    </div>
+                </div>
+                <div class="bg-slate-900/80 border border-emerald-500/35 rounded-2xl p-4">
+                    <div class="text-xs text-slate-400 mb-1">Jawaban Benar</div>
+                    <div id="final-correct" class="font-display font-black text-2xl sm:text-3xl text-emerald-400">
+                        0
+                    </div>
+                </div>
+                <div class="bg-slate-900/80 border border-rose-500/35 rounded-2xl p-4">
+                    <div class="text-xs text-slate-400 mb-1">Jawaban Salah</div>
+                    <div id="final-wrong" class="font-display font-black text-2xl sm:text-3xl text-rose-400">
+                        0
+                    </div>
+                </div>
+                <div class="bg-slate-900/80 border border-cyan-500/35 rounded-2xl p-4">
+                    <div class="text-xs text-slate-400 mb-1">Keberhasilan</div>
+                    <div id="final-percentage" class="font-display font-black text-2xl sm:text-3xl text-cyan-300">
+                        0%
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tombol Main Lagi -->
+            <button onclick="restartGame()" class="cyber-glow-btn px-8 py-4 rounded-2xl font-display font-bold text-base sm:text-lg text-white tracking-wide cursor-pointer inline-flex items-center gap-2.5">
+                <span>🔄 Main Lagi</span>
+            </button>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-4xl mx-auto px-4 py-3 text-center text-xs text-slate-500 z-10">
+        Media Pembelajaran Matematika Interaktif • Materi Matriks Berordo 3×3
+    </footer>
+
+    <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+    <script>
+        /**
+         * Helper untuk merender matriks 3x3 dalam HTML yang rapi dengan kurung siku besar
+         * @param {Array<Array<number|string>>} rows - Array 2D berukuran 3x3
+         * @param {string} label - Opsional label nama matriks, misal "A ="
+         * @param {boolean} isOption - True jika dirender di dalam tombol pilihan jawaban
+         */
+        function renderMatrix(rows, label = '', isOption = false) {
+            const labelHtml = label ? `<span class="matrix-label">${label}</span>` : '';
+            const cellsHtml = rows.flat().map(val => `<span class="matrix-cell">${val}</span>`).join('');
+            return `
+                <span class="matrix-wrapper ${isOption ? 'matrix-option' : ''}">
+                    ${labelHtml}
+                    <span class="matrix-bracket" role="table" aria-label="Matriks 3 kali 3">
+                        ${cellsHtml}
+                    </span>
+                </span>
+            `;
+        }
+
+        /**
+         * BANK 15 SOAL PILIHAN GANDA MATRIKS 3x3
+         * Terverifikasi 100% akurat secara matematis.
+         * Level 1 (Soal 1-5): Konsep dasar, ordo, elemen, kesamaan, transpose
+         * Level 2 (Soal 6-10): Penjumlahan, pengurangan, perkalian skalar
+         * Level 3 (Soal 11-15): Determinan 3x3 & perkalian dua matriks 3x3
+         */
+        const questionsData = [
+            // ==================== LEVEL 1: MUDAH (SOAL 1 - 5) ====================
+            {
+                level: 1,
+                topic: "Konsep Dasar Matriks 3×3",
+                question: `Perhatikan susunan bilangan berbentuk persegi panjang yang diatur menurut baris dan kolom dalam kurung siku berikut:<br>
+                <div class="my-3 flex justify-center">${renderMatrix([[2, -1, 4], [0, 5, -3], [7, 1, 6]], 'M =')}</div>
+                Banyaknya seluruh elemen (entri) penyusun matriks berordo 3×3 tersebut adalah ....`,
+                options: [
+                    "6 elemen",
+                    "9 elemen",
+                    "3 elemen",
+                    "12 elemen"
+                ],
+                correctIndex: 1,
+                explanation: "Matriks berordo 3×3 memiliki 3 baris dan 3 kolom. Total seluruh elemennya adalah hasil kali banyak baris dan kolom, yaitu 3 × 3 = 9 elemen."
+            },
+            {
+                level: 1,
+                topic: "Menentukan Ordo Matriks",
+                question: `Diberikan matriks <span class="text-cyan-300 font-bold">P</span> sebagai berikut:<br>
+                <div class="my-3 flex justify-center">${renderMatrix([[4, 8, 2], [-5, 0, 9], [1, -3, 7]], 'P =')}</div>
+                Ordo dari matriks <span class="text-cyan-300 font-bold">P</span> di atas adalah ....`,
+                options: [
+                    "3 × 3",
+                    "3 × 2",
+                    "2 × 3",
+                    "9 × 1"
+                ],
+                correctIndex: 0,
+                explanation: "Ordo matriks dinyatakan sebagai (banyak baris) × (banyak kolom). Matriks P memiliki 3 baris mendatar dan 3 kolom tegak, sehingga ordonya adalah 3 × 3."
+            },
+            {
+                level: 1,
+                topic: "Menentukan Elemen Matriks",
+                question: `Diketahui matriks <span class="text-cyan-300 font-bold">A</span> berikut ini:<br>
+                <div class="my-3 flex justify-center">${renderMatrix([[5, -2, 8], [4, 0, -6], [9, 3, 1]], 'A =')}</div>
+                Nilai dari <span class="font-mono text-cyan-300 font-bold">a<sub>23</sub> + a<sub>31</sub></span> adalah ....`,
+                options: [
+                    "12",
+                    "-3",
+                    "3",
+                    "7"
+                ],
+                correctIndex: 2,
+                explanation: "Elemen a<sub>23</sub> berada pada baris ke-2 kolom ke-3 yaitu -6. Elemen a<sub>31</sub> berada pada baris ke-3 kolom ke-1 yaitu 9. Maka, a<sub>23</sub> + a<sub>31</sub> = -6 + 9 = 3."
+            },
+            {
+                level: 1,
+                topic: "Kesamaan Dua Matriks 3×3",
+                question: `Diketahui kesamaan dua matriks berordo 3×3 berikut:<br>
+                <div class="my-3 flex flex-wrap items-center justify-center gap-2">
+                    ${renderMatrix([[3, '2x', 5], [1, 7, -4], [0, 6, 9]])}
+                    <span class="font-display font-bold text-xl text-cyan-300">=</span>
+                    ${renderMatrix([[3, 8, 5], [1, 'y + 2', -4], [0, 6, 9]])}
+                </div>
+                Nilai dari <span class="font-mono text-cyan-300 font-bold">x + y</span> yang memenuhi kesamaan matriks tersebut adalah ....`,
+                options: [
+                    "11",
+                    "9",
+                    "7",
+                    "13"
+                ],
+                correctIndex: 1,
+                explanation: "Dua matriks sama jika elemen seletak bernilai sama: 2x = 8 ➔ x = 4, dan y + 2 = 7 ➔ y = 5. Jadi, nilai x + y = 4 + 5 = 9."
+            },
+            {
+                level: 1,
+                topic: "Transpose Matriks 3×3",
+                question: `Diketahui matriks <span class="text-cyan-300 font-bold">B</span> sebagai berikut:<br>
+                <div class="my-3 flex justify-center">${renderMatrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]], 'B =')}</div>
+                Transpose dari matriks <span class="text-cyan-300 font-bold">B</span> (ditulis <span class="font-mono text-cyan-300">B<sup>T</sup></span>) adalah ....`,
+                options: [
+                    renderMatrix([[1, 4, 7], [2, 5, 8], [3, 6, 9]], '', true),
+                    renderMatrix([[9, 8, 7], [6, 5, 4], [3, 2, 1]], '', true),
+                    renderMatrix([[1, 2, 3], [7, 8, 9], [4, 5, 6]], '', true),
+                    renderMatrix([[7, 4, 1], [8, 5, 2], [9, 6, 3]], '', true)
+                ],
+                correctIndex: 0,
+                explanation: "Transpose matriks diperoleh dengan menukar setiap baris menjadi kolom: Baris 1 [1, 2, 3] menjadi Kolom 1, Baris 2 [4, 5, 6] menjadi Kolom 2, dan Baris 3 [7, 8, 9] menjadi Kolom 3."
+            },
+
+            // ==================== LEVEL 2: SEDANG (SOAL 6 - 10) ====================
+            {
+                level: 2,
+                topic: "Penjumlahan Matriks 3×3",
+                question: `Hasil dari penjumlahan dua matriks 3×3 berikut adalah ....<br>
+                <div class="my-3 flex flex-wrap items-center justify-center gap-2">
+                    ${renderMatrix([[2, 4, -1], [3, 0, 5], [-2, 6, 1]])}
+                    <span class="font-display font-bold text-xl text-cyan-300">+</span>
+                    ${renderMatrix([[3, -1, 4], [2, 5, -3], [4, -2, 6]])}
+                </div>`,
+                options: [
+                    renderMatrix([[5, 3, 3], [5, 5, 2], [2, 4, 7]], '', true),
+                    renderMatrix([[5, 5, 3], [5, 5, 8], [2, 8, 7]], '', true),
+                    renderMatrix([[-1, 5, -5], [1, -5, 8], [-6, 8, -5]], '', true),
+                    renderMatrix([[5, 3, 5], [5, 5, 2], [6, 4, 7]], '', true)
+                ],
+                correctIndex: 0,
+                explanation: "Jumlahkan elemen-elemen yang seletak:<br>Baris 1: [2+3, 4+(-1), -1+4] = [5, 3, 3]<br>Baris 2: [3+2, 0+5, 5+(-3)] = [5, 5, 2]<br>Baris 3: [-2+4, 6+(-2), 1+6] = [2, 4, 7]."
+            },
+            {
+                level: 2,
+                topic: "Pengurangan Matriks 3×3",
+                question: `Diketahui matriks <span class="text-cyan-300 font-bold">A</span> dan <span class="text-cyan-300 font-bold">B</span> berikut:<br>
+                <div class="my-3 flex flex-wrap items-center justify-center gap-3">
+                    ${renderMatrix([[8, 5, 3], [4, 7, 2], [6, 1, 9]], 'A =')}
+                    ${renderMatrix([[3, 2, 5], [1, 4, -2], [6, 3, 4]], 'B =')}
+                </div>
+                Hasil dari <span class="font-mono text-cyan-300 font-bold">A − B</span> adalah ....`,
+                options: [
+                    renderMatrix([[5, 3, 8], [3, 3, 0], [0, 2, 5]], '', true),
+                    renderMatrix([[5, 3, -2], [3, 3, 4], [0, -2, 5]], '', true),
+                    renderMatrix([[11, 7, 8], [5, 11, 0], [12, 4, 13]], '', true),
+                    renderMatrix([[-5, -3, 2], [-3, -3, -4], [0, 2, -5]], '', true)
+                ],
+                correctIndex: 1,
+                explanation: "Kurangkan elemen seletak pada A dengan B:<br>Baris 1: [8-3, 5-2, 3-5] = [5, 3, -2]<br>Baris 2: [4-1, 7-4, 2-(-2)] = [3, 3, 4]<br>Baris 3: [6-6, 1-3, 9-4] = [0, -2, 5]."
+            },
+            {
+                level: 2,
+                topic: "Perkalian Matriks dengan Skalar",
+                question: `Jika matriks <span class="text-cyan-300 font-bold">K</span> adalah:<br>
+                <div class="my-3 flex justify-center">${renderMatrix([[2, -3, 1], [0, 4, -2], [5, -1, 3]], 'K =')}</div>
+                Maka hasil dari perkalian skalar <span class="font-mono text-cyan-300 font-bold">3K</span> adalah ....`,
+                options: [
+                    renderMatrix([[6, -9, 3], [3, 12, -6], [15, -3, 9]], '', true),
+                    renderMatrix([[5, 0, 4], [3, 7, 1], [8, 2, 6]], '', true),
+                    renderMatrix([[6, -9, 3], [0, 12, -6], [15, -3, 9]], '', true),
+                    renderMatrix([[6, 9, 3], [0, 12, 6], [15, 3, 9]], '', true)
+                ],
+                correctIndex: 2,
+                explanation: "Kalikan setiap elemen matriks K dengan bilangan skalar 3:<br>3×2=6, 3×(-3)=-9, 3×1=3; 3×0=0, 3×4=12, 3×(-2)=-6; 3×5=15, 3×(-1)=-3, 3×3=9."
+            },
+            {
+                level: 2,
+                topic: "Kombinasi Operasi Skalar & Penjumlahan",
+                question: `Diketahui matriks <span class="text-cyan-300 font-bold">P</span> dan <span class="text-cyan-300 font-bold">Q</span>:<br>
+                <div class="my-3 flex flex-wrap items-center justify-center gap-3">
+                    ${renderMatrix([[1, 2, 0], [3, -1, 2], [0, 4, 1]], 'P =')}
+                    ${renderMatrix([[2, 1, 3], [0, 4, -1], [5, 1, 2]], 'Q =')}
+                </div>
+                Elemen pada <span class="text-amber-300 font-semibold">baris ke-2 kolom ke-2</span> dari matriks <span class="font-mono text-cyan-300 font-bold">2P + Q</span> adalah ....`,
+                options: [
+                    "2",
+                    "3",
+                    "6",
+                    "-2"
+                ],
+                correctIndex: 0,
+                explanation: "Cukup hitung elemen baris ke-2 kolom ke-2: 2·p<sub>22</sub> + q<sub>22</sub> = 2(-1) + 4 = -2 + 4 = 2."
+            },
+            {
+                level: 2,
+                topic: "Operasi Pengurangan & Skalar",
+                question: `Diketahui matriks identitas 3×3 <span class="font-mono text-cyan-300">I</span> dan matriks <span class="font-mono text-cyan-300">A</span>:<br>
+                <div class="my-3 flex flex-wrap items-center justify-center gap-3">
+                    ${renderMatrix([[4, 2, 1], [0, 5, 3], [2, 1, 6]], 'A =')}
+                    ${renderMatrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]], 'I =')}
+                </div>
+                Hasil dari <span class="font-mono text-cyan-300 font-bold">A − 2I</span> adalah ....`,
+                options: [
+                    renderMatrix([[2, 2, 1], [0, 3, 3], [2, 1, 4]], '', true),
+                    renderMatrix([[2, 0, -1], [-2, 3, 1], [0, -1, 4]], '', true),
+                    renderMatrix([[6, 2, 1], [0, 7, 3], [2, 1, 8]], '', true),
+                    renderMatrix([[3, 2, 1], [0, 4, 3], [2, 1, 5]], '', true)
+                ],
+                correctIndex: 0,
+                explanation: "Matriks 2I memiliki elemen 2 pada diagonal utama dan 0 di luar diagonal utama. Sehingga A - 2I hanya mengurangi elemen diagonal utama A dengan 2: (4-2)=2, (5-2)=3, dan (6-2)=4."
+            },
+
+            // ==================== LEVEL 3: SULIT (SOAL 11 - 15) ====================
+            {
+                level: 3,
+                topic: "Determinan Matriks Segitiga 3×3",
+                question: `Tentukan nilai determinan dari matriks segitiga atas <span class="text-cyan-300 font-bold">M</span> berikut:<br>
+                <div class="my-3 flex justify-center">${renderMatrix([[3, 5, -2], [0, 4, 7], [0, 0, -2]], 'M =')}</div>
+                Nilai <span class="font-mono text-cyan-300 font-bold">det(M)</span> adalah ....`,
+                options: [
+                    "24",
+                    "-24",
+                    "5",
+                    "-12"
+                ],
+                correctIndex: 1,
+                explanation: "Untuk matriks segitiga (atas maupun bawah), determinannya adalah hasil kali seluruh elemen pada diagonal utama: det(M) = 3 × 4 × (-2) = -24."
+            },
+            {
+                level: 3,
+                topic: "Determinan Matriks 3×3 (Metode Sarrus)",
+                question: `Hitunglah nilai determinan dari matriks <span class="text-cyan-300 font-bold">A</span> berikut:<br>
+                <div class="my-3 flex justify-center">${renderMatrix([[2, 1, 3], [1, 0, 2], [4, 1, 1]], 'A =')}</div>
+                Nilai <span class="font-mono text-cyan-300 font-bold">|A|</span> adalah ....`,
+                options: [
+                    "10",
+                    "-4",
+                    "6",
+                    "4"
+                ],
+                correctIndex: 2,
+                explanation: "Menggunakan aturan Sarrus:<br>Diagonal utama: (2·0·1) + (1·2·4) + (3·1·1) = 0 + 8 + 3 = 11.<br>Diagonal sekunder: (3·0·4) + (2·2·1) + (1·1·1) = 0 + 4 + 1 = 5.<br>Maka det(A) = 11 - 5 = 6."
+            },
+            {
+                level: 3,
+                topic: "Determinan & Matriks Singular",
+                question: `Diketahui matriks <span class="text-cyan-300 font-bold">B</span> adalah matriks singular (memiliki determinan sama dengan 0):<br>
+                <div class="my-3 flex justify-center">${renderMatrix([[1, 2, 1], [2, 'x', 2], [3, 1, 4]], 'B =')}</div>
+                Nilai <span class="font-mono text-cyan-300 font-bold">x</span> yang memenuhi adalah ....`,
+                options: [
+                    "2",
+                    "4",
+                    "3",
+                    "6"
+                ],
+                correctIndex: 1,
+                explanation: "Dengan aturan Sarrus:<br>det(B) = (1·x·4 + 2·2·3 + 1·2·1) - (1·x·3 + 1·2·1 + 2·2·4) = (4x + 12 + 2) - (3x + 2 + 16) = (4x + 14) - (3x + 18) = x - 4.<br>Karena det(B) = 0, maka x - 4 = 0 ➔ x = 4."
+            },
+            {
+                level: 3,
+                topic: "Perkalian Dua Matriks 3×3",
+                question: `Diketahui dua matriks 3×3 berikut:<br>
+                <div class="my-3 flex flex-wrap items-center justify-center gap-3">
+                    ${renderMatrix([[1, 2, 0], [3, 1, 2], [0, 2, 1]], 'A =')}
+                    ${renderMatrix([[2, 1, 3], [0, 4, 1], [5, 2, 2]], 'B =')}
+                </div>
+                Berapakah nilai elemen pada <span class="text-amber-300 font-semibold">baris ke-2 kolom ke-3</span> dari hasil perkalian <span class="font-mono text-cyan-300 font-bold">A × B</span>?`,
+                options: [
+                    "14",
+                    "11",
+                    "16",
+                    "9"
+                ],
+                correctIndex: 0,
+                explanation: "Elemen baris ke-2 kolom ke-3 dari (A × B) diperoleh dengan mengalikan baris ke-2 matriks A [3, 1, 2] dengan kolom ke-3 matriks B [3, 1, 2]:<br>(3 × 3) + (1 × 1) + (2 × 2) = 9 + 1 + 4 = 14."
+            },
+            {
+                level: 3,
+                topic: "Perkalian Lengkap Matriks 3×3",
+                question: `Tentukan hasil perkalian dua matriks 3×3 berikut:<br>
+                <div class="my-3 flex flex-wrap items-center justify-center gap-2">
+                    ${renderMatrix([[1, 0, 2], [0, 1, 0], [2, 0, 1]])}
+                    <span class="font-display font-bold text-xl text-cyan-300">×</span>
+                    ${renderMatrix([[3, 1, 0], [2, 4, 1], [1, 0, 2]])}
+                </div>`,
+                options: [
+                    renderMatrix([[5, 1, 4], [2, 4, 1], [7, 2, 2]], '', true),
+                    renderMatrix([[3, 0, 0], [0, 4, 0], [2, 0, 2]], '', true),
+                    renderMatrix([[5, 1, 2], [2, 4, 1], [7, 2, 4]], '', true),
+                    renderMatrix([[4, 1, 4], [2, 5, 1], [7, 2, 3]], '', true)
+                ],
+                correctIndex: 0,
+                explanation: "Kalikan baris matriks pertama dengan kolom matriks kedua:<br>• Baris 1: [1·3+0·2+2·1, 1·1+0·4+2·0, 1·0+0·1+2·2] = [5, 1, 4]<br>• Baris 2: [0·3+1·2+0·1, 0·1+1·4+0·0, 0·0+1·1+0·2] = [2, 4, 1]<br>• Baris 3: [2·3+0·2+1·1, 2·1+0·4+1·0, 2·0+0·1+1·2] = [7, 2, 2]."
+            }
+        ];
+
+        // ==================== STATE PERMAINAN ====================
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let timeLeft = 30;
+        let timerInterval = null;
+        let hasAnswered = false;
+        let audioEnabled = true;
+        let audioCtx = null;
+
+        // ==================== WEB AUDIO API (EFEK SUARA SINTETIS) ====================
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    audioCtx = new AudioContext();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const icon = document.getElementById('audio-icon');
+            const label = document.getElementById('audio-label');
+            if (audioEnabled) {
+                icon.textContent = '🔊';
+                label.textContent = 'Suara Aktif';
+                initAudio();
+                playClickSound();
+            } else {
+                icon.textContent = '🔇';
+                label.textContent = 'Suara Mati';
+            }
+        }
+
+        function playTone(freq, type, duration, delay = 0, gainVal = 0.15) {
+            if (!audioEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+
+            gain.gain.setValueAtTime(gainVal, audioCtx.currentTime + delay);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start(audioCtx.currentTime + delay);
+            osc.stop(audioCtx.currentTime + delay + duration);
+        }
+
+        function playClickSound() {
+            playTone(620, 'sine', 0.08, 0, 0.1);
+        }
+
+        function playCorrectSound() {
+            // Arpeggio ceria (C5 - E5 - G5 - C6)
+            playTone(523.25, 'triangle', 0.14, 0, 0.18);
+            playTone(659.25, 'triangle', 0.14, 0.09, 0.18);
+            playTone(783.99, 'triangle', 0.14, 0.18, 0.18);
+            playTone(1046.50, 'sine', 0.35, 0.27, 0.22);
+        }
+
+        function playWrongSound() {
+            // Nada turun lembut
+            playTone(310, 'sawtooth', 0.18, 0, 0.12);
+            playTone(235, 'sawtooth', 0.28, 0.15, 0.12);
+        }
+
+        function playLevelUpSound() {
+            playTone(440, 'sine', 0.12, 0, 0.15);
+            playTone(554.37, 'sine', 0.12, 0.1, 0.15);
+            playTone(659.25, 'sine', 0.25, 0.2, 0.18);
+        }
+
+        function playFinishSound() {
+            const notes = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5];
+            notes.forEach((n, idx) => {
+                playTone(n, 'triangle', idx === notes.length - 1 ? 0.45 : 0.14, idx * 0.11, 0.18);
+            });
+        }
+
+        // ==================== LOGIKA NAVIGASI & PERMAINAN ====================
+        function startGame() {
+            initAudio();
+            playClickSound();
+            resetGameState();
+
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+
+            loadQuestion();
+        }
+
+        function restartGame() {
+            stopConfetti();
+            startGame();
+        }
+
+        function resetGameState() {
+            currentQuestionIndex = 0;
+            score = 0;
+            correctCount = 0;
+            wrongCount = 0;
+            timeLeft = 30;
+            hasAnswered = false;
+            clearInterval(timerInterval);
+            updateScoreUI();
+        }
+
+        function updateScoreUI() {
+            document.getElementById('score-text').textContent = score;
+        }
+
+        function updateLevelBadge(level) {
+            const badge = document.getElementById('level-badge');
+            if (level === 1) {
+                badge.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-display font-bold tracking-wide bg-emerald-500/20 border border-emerald-400/50 text-emerald-300";
+                badge.textContent = "LEVEL 1 • MUDAH";
+            } else if (level === 2) {
+                badge.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-display font-bold tracking-wide bg-amber-500/20 border border-amber-400/50 text-amber-300";
+                badge.textContent = "LEVEL 2 • SEDANG";
+            } else {
+                badge.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-display font-bold tracking-wide bg-rose-500/20 border border-rose-400/50 text-rose-300";
+                badge.textContent = "LEVEL 3 • SULIT";
+            }
+        }
+
+        function showLevelUpNotification(level) {
+            const banner = document.getElementById('level-up-banner');
+            const text = document.getElementById('level-up-text');
+            if (level === 2) {
+                text.textContent = "⚡ NAIK LEVEL! MEMASUKI LEVEL 2: TANTANGAN SEDANG!";
+            } else if (level === 3) {
+                text.textContent = "🔥 LEVEL PUNCAK! MEMASUKI LEVEL 3: TANTANGAN SULIT!";
+            }
+            banner.classList.remove('hidden');
+            playLevelUpSound();
+            setTimeout(() => {
+                banner.classList.add('hidden');
+            }, 3500);
+        }
+
+        function loadQuestion() {
+            hasAnswered = false;
+            const q = questionsData[currentQuestionIndex];
+            const qNum = currentQuestionIndex + 1;
+
+            // Cek transisi naik level pada soal ke-6 (Level 2) dan soal ke-11 (Level 3)
+            if (qNum === 6 || qNum === 11) {
+                showLevelUpNotification(q.level);
+            } else {
+                document.getElementById('level-up-banner').classList.add('hidden');
+            }
+
+            // Update indikator UI
+            updateLevelBadge(q.level);
+            document.getElementById('question-number').textContent = qNum;
+            document.getElementById('question-topic').textContent = q.topic;
+            document.getElementById('question-content').innerHTML = q.question;
+
+            // Update progress bar
+            const progressPercent = (qNum / questionsData.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+
+            // Sembunyikan kotak feedback & reset animasi kartu
+            const feedbackBox = document.getElementById('feedback-box');
+            feedbackBox.classList.add('hidden');
+            const qCard = document.getElementById('question-card');
+            qCard.classList.remove('animate-shake', 'animate-pop');
+
+            // Render 4 pilihan jawaban (A, B, C, D)
+            const letters = ['A', 'B', 'C', 'D'];
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.id = `option-btn-${idx}`;
+                btn.className = 'option-btn w-full rounded-2xl p-3.5 sm:p-4 text-left flex items-center gap-3.5 cursor-pointer group';
+                btn.onclick = () => selectAnswer(idx);
+
+                btn.innerHTML = `
+                    <span class="w-9 h-9 rounded-xl bg-slate-900/90 border border-cyan-500/40 group-hover:border-cyan-300 flex items-center justify-center font-display font-bold text-sm text-cyan-300 shrink-0">
+                        ${letters[idx]}
+                    </span>
+                    <div class="text-sm sm:text-base text-white font-medium overflow-x-auto">
+                        ${opt}
+                    </div>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+
+            // Mulai Timer 30 Detik
+            startTimer();
+        }
+
+        // ==================== TIMER 30 DETIK ====================
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 30;
+            const timerBox = document.getElementById('timer-box');
+            const timerText = document.getElementById('timer-text');
+
+            timerBox.classList.remove('timer-urgent');
+            timerText.textContent = timeLeft;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerText.textContent = timeLeft;
+
+                if (timeLeft <= 9 && timeLeft > 0) {
+                    timerBox.classList.add('timer-urgent');
+                    if (timeLeft <= 5) {
+                        playTone(880, 'sine', 0.05, 0, 0.05);
+                    }
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        function handleTimeOut() {
+            if (hasAnswered) return;
+            hasAnswered = true;
+            wrongCount++;
+            playWrongSound();
+
+            const q = questionsData[currentQuestionIndex];
+            const buttons = document.querySelectorAll('#options-container button');
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove('cursor-pointer');
+                if (idx === q.correctIndex) {
+                    btn.classList.add('option-correct');
+                } else {
+                    btn.classList.add('option-dimmed');
+                }
+            });
+
+            document.getElementById('question-card').classList.add('animate-shake');
+            showFeedback(false, true);
+        }
+
+        // ==================== PENGECEKAN JAWABAN ====================
+        function selectAnswer(selectedIndex) {
+            if (hasAnswered) return;
+            hasAnswered = true;
+            clearInterval(timerInterval);
+            document.getElementById('timer-box').classList.remove('timer-urgent');
+
+            const q = questionsData[currentQuestionIndex];
+            const isCorrect = selectedIndex === q.correctIndex;
+            const buttons = document.querySelectorAll('#options-container button');
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove('cursor-pointer');
+                if (idx === q.correctIndex) {
+                    btn.classList.add('option-correct');
+                } else if (idx === selectedIndex && !isCorrect) {
+                    btn.classList.add('option-wrong');
+                } else {
+                    btn.classList.add('option-dimmed');
+                }
+            });
+
+            const qCard = document.getElementById('question-card');
+            if (isCorrect) {
+                score += 10;
+                correctCount++;
+                updateScoreUI();
+                playCorrectSound();
+                qCard.classList.add('animate-pop');
+            } else {
+                wrongCount++;
+                playWrongSound();
+                qCard.classList.add('animate-shake');
+            }
+
+            showFeedback(isCorrect, false);
+        }
+
+        function showFeedback(isCorrect, isTimeout) {
+            const q = questionsData[currentQuestionIndex];
+            const feedbackBox = document.getElementById('feedback-box');
+            const feedbackIcon = document.getElementById('feedback-icon');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const explanationText = document.getElementById('explanation-text');
+            const nextBtnText = document.getElementById('next-btn-text');
+
+            feedbackBox.classList.remove('hidden');
+
+            if (isCorrect) {
+                feedbackBox.className = "mt-6 rounded-2xl p-4 sm:p-5 border border-emerald-400/60 bg-emerald-950/55 transition-all";
+                feedbackIcon.textContent = "🎉";
+                feedbackTitle.className = "font-display font-bold text-base sm:text-lg text-emerald-300";
+                feedbackTitle.textContent = "Hebat! Jawaban Kamu Benar!";
+            } else {
+                feedbackBox.className = "mt-6 rounded-2xl p-4 sm:p-5 border border-rose-400/60 bg-rose-950/55 transition-all";
+                feedbackIcon.textContent = isTimeout ? "⏰" : "💪";
+                feedbackTitle.className = "font-display font-bold text-base sm:text-lg text-rose-300";
+                feedbackTitle.textContent = isTimeout
+                    ? "Waktu Habis! Tetap Semangat! Coba Lagi di Soal Berikutnya!"
+                    : "Tetap Semangat! Coba Lagi di Soal Berikutnya!";
+            }
+
+            explanationText.innerHTML = q.explanation;
+
+            if (currentQuestionIndex === questionsData.length - 1) {
+                nextBtnText.textContent = "Lihat Hasil Akhir";
+            } else {
+                nextBtnText.textContent = "Soal Berikutnya";
+            }
+
+            // Smooth scroll ke feedback pada layar kecil jika perlu
+            setTimeout(() => {
+                feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        function nextQuestion() {
+            playClickSound();
+            if (currentQuestionIndex < questionsData.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                showFinalResults();
+            }
+        }
+
+        // ==================== HALAMAN AKHIR & PREDIKAT ====================
+        function showFinalResults() {
+            clearInterval(timerInterval);
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            const totalQuestions = questionsData.length;
+            const percentage = Math.round((correctCount / totalQuestions) * 100);
+
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('final-correct').textContent = correctCount;
+            document.getElementById('final-wrong').textContent = wrongCount;
+            document.getElementById('final-percentage').textContent = `${percentage}%`;
+
+            // Penentuan Predikat Sesuai Ketentuan Skor
+            let predicate = "";
+            let desc = "";
+            const predicateCard = document.getElementById('predicate-card');
+
+            if (score >= 130) {
+                predicate = "Ahli Matriks 🏆";
+                desc = "Luar biasa! Kamu menguasai seluruh operasi dan determinan matriks 3×3 dengan sangat presisi!";
+                predicateCard.className = "max-w-md mx-auto rounded-2xl p-5 mb-7 bg-gradient-to-br from-amber-500/25 via-purple-600/30 to-cyan-500/30 border-2 border-amber-400 shadow-lg shadow-amber-500/25";
+                startConfetti();
+            } else if (score >= 100) {
+                predicate = "Hebat 🎉";
+                desc = "Kerja bagus! Pemahamanmu tentang matriks 3×3 sudah sangat kuat. Sedikit lagi menuju Ahli Matriks!";
+                predicateCard.className = "max-w-md mx-auto rounded-2xl p-5 mb-7 bg-gradient-to-br from-emerald-500/25 via-blue-600/30 to-cyan-500/30 border-2 border-emerald-400 shadow-lg shadow-emerald-500/20";
+                startConfetti();
+            } else if (score >= 70) {
+                predicate = "Cukup Baik 👍";
+                desc = "Hasil yang baik! Terus asah ketelitianmu pada operasi perkalian dan determinan matriks 3×3.";
+                predicateCard.className = "max-w-md mx-auto rounded-2xl p-5 mb-7 bg-gradient-to-br from-blue-600/30 via-indigo-600/30 to-cyan-500/30 border-2 border-cyan-400/70 shadow-lg";
+            } else {
+                predicate = "Terus Berlatih 💪";
+                desc = "Jangan menyerah! Pelajari kembali pembahasan di setiap soal dan coba taklukkan Dunia Matriks lagi!";
+                predicateCard.className = "max-w-md mx-auto rounded-2xl p-5 mb-7 bg-gradient-to-br from-purple-600/30 via-rose-600/25 to-slate-800/60 border-2 border-purple-400/60 shadow-lg";
+            }
+
+            document.getElementById('final-predicate').textContent = predicate;
+            document.getElementById('predicate-desc').textContent = desc;
+
+            playFinishSound();
+        }
+
+        // ==================== ANIMASI KONFETI CANVAS ====================
+        let confettiParticles = [];
+        let confettiAnimId = null;
+
+        function startConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const colors = ['#38bdf8', '#a855f7', '#fbbf24', '#34d399', '#f472b6', '#ffffff'];
+            confettiParticles = [];
+
+            for (let i = 0; i < 110; i++) {
+                confettiParticles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    w: Math.random() * 9 + 5,
+                    h: Math.random() * 5 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speedY: Math.random() * 3 + 2,
+                    speedX: Math.random() * 2 - 1,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: Math.random() * 6 - 3
+                });
+            }
+
+            function renderConfetti() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                confettiParticles.forEach(p => {
+                    p.y += p.speedY;
+                    p.x += p.speedX;
+                    p.rotation += p.rotationSpeed;
+
+                    if (p.y > canvas.height) {
+                        p.y = -10;
+                        p.x = Math.random() * canvas.width;
+                    }
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rotation * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                    ctx.restore();
+                });
+
+                confettiAnimId = requestAnimationFrame(renderConfetti);
+            }
+
+            renderConfetti();
+        }
+
+        function stopConfetti() {
+            if (confettiAnimId) {
+                cancelAnimationFrame(confettiAnimId);
+                confettiAnimId = null;
+            }
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('confetti-canvas');
+            if (canvas) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+        });
+    </script>
+</body>
+</html>
